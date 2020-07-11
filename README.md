@@ -97,26 +97,28 @@ namespace TodoApi.Models
 
 ### Create a service class
 
-```c#
-using System.Collections.Generic;
-using TodoApi.Models;
+- Create a sevice that returns list of items : 
 
-namespace TodoApi.Services
-{
-  public class TodosService
+  ```c#
+  using System.Collections.Generic;
+  using TodoApi.Models;
+
+  namespace TodoApi.Services
   {
-    public IEnumerable<Todo> Get()
+    public class TodosService
     {
-      var one = new Todo(){Id = 1, Name="Do first thing", IsComplete = false};
-      var two = new Todo(){Id = 1, Name="Do second thing", IsComplete = true};
-      IList<Todo> list = new List<Todo>();
-      list.Add(one);
-      list.Add(two);
-      return list;
+      public IEnumerable<Todo> Get()
+      {
+        var one = new Todo(){Id = 1, Name="Do first thing", IsComplete = false};
+        var two = new Todo(){Id = 1, Name="Do second thing", IsComplete = true};
+        IList<Todo> list = new List<Todo>();
+        list.Add(one);
+        list.Add(two);
+        return list;
+      }
     }
   }
-}
-```
+  ```
 
 
 
@@ -152,7 +154,7 @@ namespace TodoApi.Services
     {
       private TodosService _service;
       
-    public TodosController(TodosService service )
+    	public TodosController(TodosService service )
       {
       _service = service;
       }
@@ -189,46 +191,88 @@ namespace TodoApi.Services
 
   
 
-  
-  
+##DB with EntityFrameWorkCore
 
-### Create TodoContext (database context with EntityFrameworkCore)
+- Create databse context for the `Todo` model
 
-```c#
-using Microsoft.EntityFrameworkCore;
+  ```c#
+  using Microsoft.EntityFrameworkCore;
 
-namespace TodoApi.Models
-{
-  public class TodoContext : DbContext
+  namespace TodoApi.Models
   {
-    public TodoContext(DbContextOptions<TodoContext> options): base(options) { }
-    
-    public DbSet<Todo> Todos { get; set; }
+    public class TodoContext : DbContext
+    {
+      public TodoContext(DbContextOptions<TodoContext> options): base(options) { }
 
+      public DbSet<Todo> Todos { get; set; }
+
+    }
   }
-}
-```
+  ```
 
+- Register db context so we can inject it in our service 
 
+  ```diff
+   using TodoApi.Services;
+  +using Microsoft.EntityFrameworkCore;
+  +using TodoApi.Models;
+  
+   namespace TodoApi
+   {
+     public void ConfigureServices(IServiceCollection services)
+     {
+  		 services.AddSingleton<TodosService>();   
+  +  	 services.AddDbContext<TodoContext>(options => options.UseInMemoryDatabase("TodoDatabase"))
+     	 services.AddControllers();
+     }
+  ```
 
-### Register Database Context
+- Now inject the db context in service 
 
-```diff
- using Microsoft.Extensions.Logging;
-+using Microsoft.EntityFrameworkCore;
-+using TodoApi.Models;
+  ```diff
+  +using System.Threading.Tasks;
+  
+   namespace TodoApi.Services
+   {
+     public class TodosService
+     {
+  +    private TodoContext _context;
+  +
+  +    public TodosService(TodoContext context)
+  +    {
+  +      _context = context;
+  +    }
+     }
+   }
+  ```
 
- namespace TodoApi
- {
-@@ -26,6 +28,7 @@ namespace TodoApi
-         public void ConfigureServices(IServiceCollection services)
-         {
-             services.AddControllers();
-+            services.AddDbContext<TodoContext>(options => options.UseInMemoryDatabase("TodoDatabase"))
-         }
-```
+- Now we get error on running the app : 
 
+  ```
+  Unhandled exception. System.AggregateException: Some services are not able to be constructed (Error while validating the service descriptor 'ServiceType: TodoApi.Services.TodosService Lifetime: Singleton ImplementationType: TodoApi.Services.TodosService': Cannot consume scoped service 'TodoApi.Models.TodoContext' from singleton 'TodoApi.Services.TodosService'.)
+  ```
 
+  - So it is saying that the service could not be constucted as we are tryint to inject a `scoped` dependency into a `singleton` depndency
+
+  - scoped is created for every requrest and destroyed after the request
+
+  - singleton is created only once in application
+
+  - So we will change our dependency type for service to transient : 
+
+    ```diff
+    - services.AddSingleton<TodosService>();
+    + services.AddTransient<TodosService>();
+    ```
+
+- Now run tht app and check result :   `https://localhost:5001/api/todos` : 
+
+  ```json
+  [
+  ]
+  ```
+
+  - we see no data as our database is empty. 
 
 
 

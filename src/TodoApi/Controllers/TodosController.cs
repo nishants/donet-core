@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TodoApi.Models;
 using TodoApi.Services;
@@ -17,9 +18,9 @@ namespace TodoApi.Controllers
     }
 
     [HttpGet]
-    public IEnumerable<Todo> Get()
+    public async Task<IEnumerable<Todo>> Get()
     {
-      return _service.Get();
+      return await _service.Get();
     }
   }
 }
