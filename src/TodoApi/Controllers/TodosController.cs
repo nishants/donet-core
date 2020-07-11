@@ -35,8 +35,15 @@ namespace TodoApi.Controllers
     [HttpPost]
     public async Task<ActionResult> Post(Todo todo)
     {
-      _service.Create(todo);
+      await _service.Create(todo);
+      // Generates location header url value from the `GetById` method route
       return CreatedAtAction("GetById", new {Id = 1}, todo);
+    }
+
+    [HttpPut("{id}")]
+    public ActionResult<Todo> Update(Todo todo)
+    {
+      return null;
     }
   }
 }

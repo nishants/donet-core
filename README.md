@@ -12,6 +12,15 @@ Queries
 
 
 
+### Learn
+
+- async await Task API
+- ActionResult API
+- DBContext API
+- Search from db
+
+
+
 ### Goals
 
 - [ ] Create web api
@@ -416,4 +425,10 @@ namespace TodoApi.Controllers
 }
 
 ```
+
+
+
+
+
+
 

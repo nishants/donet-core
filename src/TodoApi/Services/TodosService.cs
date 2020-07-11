@@ -25,10 +25,10 @@ namespace TodoApi.Services
       return await _context.Todos.FindAsync(id);
     }
 
-    public async void Create(Todo todo)
+    public async Task<int> Create(Todo todo)
     {
       _context.Todos.Add(todo);
-      await _context.SaveChangesAsync();
+      return await _context.SaveChangesAsync();
     }
     
   }
