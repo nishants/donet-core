@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
@@ -12,11 +13,19 @@ namespace TodoApi.Services
     public TodosService(TodoContext context)
     {
       _context = context;
+      Console.WriteLine("another controller created....");
     }
 
     public  Task<List<Todo>> Get()
     {
       return  _context.Todos.ToListAsync();
     }
+
+    public async void Create(Todo todo)
+    {
+      _context.Todos.Add(todo);
+      await _context.SaveChangesAsync();
+    }
+    
   }
 }

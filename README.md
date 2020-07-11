@@ -276,6 +276,32 @@ namespace TodoApi.Models
 
 
 
+### Create a data in database
+
+
+- Use service to save data to database : 
+
+  ```c#
+  public async void Create(Todo todo)
+  {
+    _context.Todos.Add(todo);
+    await _context.SaveChangesAsync();
+  }
+  ```
+
+- Create a post api in controller 
+
+  ```c#
+  [HttpPost]
+  public async Task<ActionResult> Post(Todo todo)
+  {
+    _service.Create(todo);
+    return Created("todo", todo);
+  }
+  ```
+
+  
+
 ### Create the controller class 
 
 ```c#
