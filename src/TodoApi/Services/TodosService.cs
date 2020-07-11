@@ -20,6 +20,10 @@ namespace TodoApi.Services
     {
       return  _context.Todos.ToListAsync();
     }
+    public async Task<Todo> GetById(long id)
+    {
+      return await _context.Todos.FindAsync(id);
+    }
 
     public async void Create(Todo todo)
     {

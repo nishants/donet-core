@@ -23,11 +23,20 @@ namespace TodoApi.Controllers
     {
       return await _service.Get(); 
     }
+    
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Todo>> GetById(long id)
+    {
+      var todo = await _service.GetById(id);
+      if (todo == null) {return NotFound();}
+      return todo;
+    }
+    
     [HttpPost]
     public async Task<ActionResult> Post(Todo todo)
     {
       _service.Create(todo);
-      return Created("todo", todo);
+      return CreatedAtAction("GetById", new {Id = 1}, todo);
     }
   }
 }
