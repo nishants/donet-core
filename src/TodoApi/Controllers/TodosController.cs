@@ -11,9 +11,9 @@ namespace TodoApi.Controllers
   [Route("api/todos")]
   public class TodosController : ControllerBase
   {
-    private TodosService _service;
+    private TodoMongoService _service;
     
-    public TodosController(TodosService service )
+    public TodosController(TodoMongoService service )
     {
       _service = service;
     }
@@ -25,7 +25,7 @@ namespace TodoApi.Controllers
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<Todo>> GetById(long id)
+    public async Task<ActionResult<Todo>> GetById(string id)
     {
       var todo = await _service.GetById(id);
       if (todo == null) {return NotFound();}

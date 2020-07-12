@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TodoApi.Models;
 using TodoApi.Services;
 
@@ -23,7 +24,17 @@ namespace TodoApi
         {
             services.AddTransient<TodosService>();
             services.AddControllers();
+            services.AddSingleton<TodoMongoService>();
             services.AddDbContext<TodoContext>(options => options.UseInMemoryDatabase("TodoDatabase"));
+            
+            // requires using Microsoft.Extensions.Options
+            services.Configure<TodosMongoSettings>(
+                            Configuration.GetSection(nameof(TodosMongoSettings)));
+
+            services.AddSingleton<TodosMongoSettings>(sp =>
+                            sp.GetRequiredService<IOptions<TodosMongoSettings>>().Value);
+            
+            // services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
